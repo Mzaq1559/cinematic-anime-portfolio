@@ -1,14 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ReactNode, FormEvent } from "react";
-import {
-  owner,
-  experience,
-  education,
-  skills,
-  projects,
-  projectCategories,
-  type Project,
-} from "../data/content";
+import { owner, experience, education, skills, projects, projectCategories, type Project } from "../data/content";
+import { EVENTS } from "../lib/events";
 
 function Section({ id, className = "", children }: { id: string; className?: string; children: ReactNode }) {
   return (
@@ -61,6 +54,14 @@ export function Journey() {
 export function Experience() {
   const [active, setActive] = useState(0);
   const job = experience[active];
+
+  // A station clicked in the 3D railway selects the matching career entry.
+  useEffect(() => {
+    const on = (e: Event) => setActive((e as CustomEvent<{ index: number }>).detail.index);
+    window.addEventListener(EVENTS.station, on);
+    return () => window.removeEventListener(EVENTS.station, on);
+  }, []);
+
   return (
     <Section id="experience" className="experience">
       <h2 className="display reveal">The Railway Journey</h2>
@@ -128,6 +129,14 @@ export function Education() {
 /* ---------- Constellation skills ---------- */
 export function Skills() {
   const [active, setActive] = useState<number | null>(null);
+
+  // A star clicked in the 3D constellation selects the matching skill group.
+  useEffect(() => {
+    const on = (e: Event) => setActive((e as CustomEvent<{ index: number }>).detail.index);
+    window.addEventListener(EVENTS.skill, on);
+    return () => window.removeEventListener(EVENTS.skill, on);
+  }, []);
+
   const isLit = (i: number) => active !== null && (i === active || skills[active].links.includes(i));
 
   return (
@@ -141,16 +150,7 @@ export function Skills() {
               .map((j) => {
                 const t = skills[j];
                 const lit = active !== null && (active === i || active === j);
-                return (
-                  <line
-                    key={`${i}-${j}`}
-                    x1={s.x}
-                    y1={s.y}
-                    x2={t.x}
-                    y2={t.y}
-                    className={lit ? "lit" : ""}
-                  />
-                );
+                return <line key={`${i}-${j}`} x1={s.x} y1={s.y} x2={t.x} y2={t.y} className={lit ? "lit" : ""} />;
               }),
           )}
         </svg>
@@ -192,6 +192,13 @@ export function Projects() {
   const close = () => setOpenIndex(null);
   const step = (dir: 1 | -1) =>
     setOpenIndex((i) => (i === null ? null : (i + dir + projects.length) % projects.length));
+
+  // A glass pane clicked in the 3D gallery opens that project.
+  useEffect(() => {
+    const on = (e: Event) => setOpenIndex((e as CustomEvent<{ index: number }>).detail.index);
+    window.addEventListener(EVENTS.project, on);
+    return () => window.removeEventListener(EVENTS.project, on);
+  }, []);
 
   useEffect(() => {
     if (openIndex === null) return;
