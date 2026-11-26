@@ -1,0 +1,82 @@
+/* ---------- 3D world layer ---------- */
+.world-canvas {
+  position: fixed !important;
+  inset: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 0;
+}
+
+/* Let clicks fall through the page to the 3D canvas, except on interactive UI. */
+main { pointer-events: none; }
+main :is(button, a, input, textarea, select, video, .glass, .glow-btn, .ghost-btn, .filters, .rail, .constellation) {
+  pointer-events: auto;
+}
+
+/* Fixes the hero "scroll to explore" hint: anchor it to the hero, not the page bottom. */
+.scene { position: relative; }
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 84px;
+  transform: translateX(-50%);
+  max-width: min(90vw, 460px);
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: rgba(16, 22, 47, 0.55);
+  border: 1px solid rgba(244, 248, 255, 0.3);
+  backdrop-filter: blur(12px);
+  font-size: 14px;
+  text-align: center;
+  z-index: 55;
+  animation: toast-in 0.4s ease-out;
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, 10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ---------- Video interludes ---------- */
+.interlude {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  min-height: 320px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.interlude video,
+.interlude-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.interlude-fallback {
+  background:
+    radial-gradient(ellipse at 70% 30%, rgba(255, 179, 106, 0.45), transparent 55%),
+    linear-gradient(180deg, #65b9ed 0%, #6e65a5 50%, #183b70 100%);
+}
+.interlude-caption {
+  position: relative;
+  margin: 0 0 32px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(1rem, 2vw, 1.4rem);
+  text-shadow: 0 0 16px rgba(0, 0, 0, 0.45);
+  z-index: 1;
+}
+
+/* Lighter scene glass over the 3D world so the scene shows through. */
+.scene .panel { background: rgba(16, 22, 47, 0.35); }
+
+/* Fallback when WebGL is missing: the sky canvas already fills the background. */
+@media (prefers-reduced-motion: reduce) {
+  .interlude video { display: none; }
+}
